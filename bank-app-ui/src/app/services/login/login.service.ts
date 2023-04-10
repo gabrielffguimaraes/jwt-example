@@ -15,6 +15,7 @@ export class LoginService {
   validateLoginDetails(user: User) {
     let headers = new HttpHeaders();
     headers = headers.append('Authorization','Basic ' + btoa(`${user.email}:${user.password}`));
+    console.log(headers);
     return this.http.post(environment.rooturl + AppConstants.LOGIN_API_LOGIN+"?email="+user.email,{}, { 
       headers,
       withCredentials: true,
@@ -23,10 +24,8 @@ export class LoginService {
     });
   }
   logout() : void {
-    this.http.get(environment.rooturl + AppConstants.LOGIN_API_LOGOUT).subscribe(() => {
-      window.localStorage.clear();
-      this.router.navigate(['login']);
-    });
+    window.localStorage.clear();
+    this.router.navigate(['login']);
   }
   getTokenDetails() {
     let token = jwt_decode<any>(localStorage.getItem('authorization')!);
@@ -35,9 +34,8 @@ export class LoginService {
   check() {
     return this.http.get(environment.rooturl, {withCredentials: true});
   }
-  /*
   isLogged() : any {
-    const token = localStorage.getItem('authorization');
+    const token = localStorage.getItem('jwtToken');
     if(!token) {
       return false;
     }
@@ -49,7 +47,8 @@ export class LoginService {
     } catch (err) {
       return false;
     }
-  }*/
+  }
+  /*
   isLogged() : any {
     let userDetails = localStorage.getItem('userdetails');
     try {
@@ -64,7 +63,7 @@ export class LoginService {
     } catch (err) {
       return false;
     }
-  }
+  }*/
   deleteLoan() : Observable<any> {
     return this.http.delete(environment.rooturl + `/loans/1` , {withCredentials: true});
   }

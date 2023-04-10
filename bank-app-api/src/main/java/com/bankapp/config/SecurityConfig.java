@@ -1,6 +1,7 @@
 package com.bankapp.config;
 
-import com.bankapp.filter.LogoutFilter;
+import com.bankapp.filter.JWTGeneratorToken;
+import com.bankapp.filter.JWTValidatorToken;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -9,8 +10,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
-import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
-import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 
 @Configuration
 public class SecurityConfig {
@@ -19,10 +18,8 @@ public class SecurityConfig {
     public SecurityFilterChain configure(HttpSecurity http) throws Exception {
         http
                 .cors().and()
-                .csrf(csrfConfigurer -> csrfConfigurer.csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler())
-                        .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-                        .ignoringRequestMatchers("/auth/login","/auth/signup","/contact"))
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.ALWAYS))
+                .csrf().disable()
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests()
                 .requestMatchers(
                         "/auth/signup",
@@ -31,7 +28,8 @@ public class SecurityConfig {
                                 "/contact").permitAll()
                 .anyRequest()
                 .authenticated().and()
-                .addFilterBefore(new LogoutFilter(), BasicAuthenticationFilter.class)
+                .addFilterBefore(new JWTValidatorToken(), BasicAuthenticationFilter.class)
+                .addFilterAfter(new JWTGeneratorToken(), BasicAuthenticationFilter.class)
                 .httpBasic();
         return http.build();
     }

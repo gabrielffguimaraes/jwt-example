@@ -48,27 +48,9 @@ export class LoginComponent implements OnInit {
     window.localStorage.setItem("userdetails", JSON.stringify(user));
   }
   handleLoginSuccess(responseData : any) {
-    this.csrfService.getCsrf().subscribe(csrf => localStorage.setItem('X-XSRF-TOKEN',csrf));
     this.saveUserDetails(responseData);
     this.navigateToDashboard();
-
-    /*
-    this.model = <any>responseData;
-    this.model.authStatus = "AUTH";
-    window.localStorage.setItem("authorization","Bearer "+responseData.headers.get('Authorization')!);
-    window.localStorage.setItem("userdetails", JSON.stringify(this.model));
-    this.navigateToDashboard();*/
-
-    /*
-    this.csrfService.getCsrf().subscribe(
-      (csrf) => {
-        this.saveCsrfToken(csrf);
-        this.navigateToDashboard();
-      },
-      (err) => {
-        this.handleLoginError(err);
-      }
-    );*/
+    window.localStorage.setItem("jwtToken","Bearer "+responseData.headers.get('Authorization')!);
   }
   saveCsrfToken(csrf :any) {
     if (csrf) {
